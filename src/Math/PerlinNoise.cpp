@@ -31,7 +31,7 @@ PerlinNoise::~PerlinNoise()
  * @param x     x position
  * @param y     y position
  */
-float PerlinNoise::noise(float x, float y, float z)
+float PerlinNoise::noise(float x, float y, float z) const
 {
     int X = (int) std::floor(x) & 255, Y = (int) std::floor(y) & 255, Z = (int) std::floor(z) & 255;
     x -= std::floor(x);
@@ -59,7 +59,7 @@ float PerlinNoise::noise(float x, float y, float z)
 /**
  * @brief Fade function
  */
-float PerlinNoise::fade(float t) 
+float PerlinNoise::fade(float t) const
 {
     return t * t * t * (t * (t * 6 - 15) + 10); 
 }
@@ -67,12 +67,16 @@ float PerlinNoise::fade(float t)
 /**
  * @brief Lerp function
  */
-float PerlinNoise::lerp(float t, float a, float b) 
+float PerlinNoise::lerp(float t, float a, float b) const
 { 
     return a + t * (b - a); 
 }
 
-float PerlinNoise::grad(int hash, float x, float y, float z) {
+/**
+ * @brief Grad function
+ */
+float PerlinNoise::grad(int hash, float x, float y, float z) const
+{
     int h = hash & 15;                      
     float u = h < 8 ? x : y, v = h < 4 ? y : h == 12 || h == 14 ? x : z;
     return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);

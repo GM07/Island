@@ -10,16 +10,14 @@ const float Chunk::DEFAULT_SIZE = 16.0f;
  * @param size                  Chunk's size (in number of tiles)
  * @param tileSize              Size of each tile
  */
-Chunk::Chunk(std::shared_ptr<sf::Texture> textureSheet, PerlinNoise& perlinNoise, const Vector& position, const Vector& size, const Vector& tileSize)
-    :   perlinNoise_(perlinNoise)
+Chunk::Chunk(std::shared_ptr<sf::Texture> textureSheet, TerrainGenerator& terrainGenerator, const Vector& position, const Vector& size, const Vector& tileSize)
+    :   terrainGenerator_(terrainGenerator)
     ,   position_(position)
     ,   size_(size)
     ,   tileSize_(tileSize)
     ,   textureSheet_(textureSheet)
 {
-    initWithPerlin();
-    filterTrees();
-    generateSand();
+    initTerrain();
 }
 
 /**
@@ -158,7 +156,7 @@ std::unordered_map<Vector, std::string, VectorHasher> Chunk::tilesColliding(cons
 /**
  * @brief Function that generates the chunk with perlin noise
  */
-void Chunk::initWithPerlin()
+void Chunk::initTerrain()
 {
     tiles_.reserve(size_.getX() * size_.getY());
 
@@ -168,7 +166,7 @@ void Chunk::initWithPerlin()
         {
             Vector pos = getPositionOfTile(i, j);
 
-            float value = perlinNoise_.noise(
+            float value = terrainGenerator_.getMapGenerator().noise(
                 pos.getX() / (tileSize_.getX() * 50.0f), 
                 pos.getY() / (tileSize_.getY() * 50.0f), 
                 0);
@@ -204,68 +202,18 @@ void Chunk::addTile(const Vector& position, const float& height)
  */
 void Chunk::generateTrees(const Vector& position, const float& height)
 {
-    if (height > 0.2f && static_cast<int>(height * 1000.0f) % 10 == 0)
+    if (height > 0.2f && static_cast<int>(height * 20.0f) % 2 == 0)
     {
-        // Generate bottom part of the tree
+        // Generate the tree
         Vector bottomPos = position + Vector(0.0f, tileSize_.getY());
-        const auto& tile = nature_.find(bottomPos);
+        Vector topPos = position - Vector(0.0f, tileSize_.getY());
 
-        if (tile != nature_.end())
-            std::cout << tile->second << "\n";
-
-        if (tile == nature_.end())
+        if (nature_.find(bottomPos) == nature_.end() &&
+            nature_.find(topPos) == nature_.end())
         {
-            nature_.erase(bottomPos);
             nature_.emplace(position, "big_tree");
         }
-        
     }
-}
-
-
-/**
- * @brief Function that filters the trees
- */
-void Chunk::filterTrees()
-{
-
-}
-
-
-/**
- * @brief   Function that changes the current 
- *          chunk so that no block of grass will 
- *          be adjacent to a block of water
- */
-void Chunk::generateSand()
-{
-    std::unordered_map<Vector, std::string, VectorHasher> grassTiles;
-
-    auto tileSorter = [&] (const std::pair<Vector, std::string>& pair) -> bool {
-
-        std::array<Vector, 4> adjacentTiles;
-        adjacentTiles[0] = pair.first + Vector(tileSize_.getX(), 0.0f); // Right
-        adjacentTiles[1] = pair.first - Vector(tileSize_.getX(), 0.0f); // Left
-        adjacentTiles[2] = pair.first + Vector(0.0f, tileSize_.getY()); // Bottom
-        adjacentTiles[3] = pair.first - Vector(0.0f, tileSize_.getY()); // Top
-
-        bool isSand = false;
-        for (const auto& tile : adjacentTiles)
-        {
-            if (tiles_.find(tile) != tiles_.end() && tiles_.find(tile)->second == "WATER")
-                isSand = true;
-        }
-
-        return isSand;
-    };
-
-    std::copy_if(tiles_.begin(), tiles_.end(), std::inserter<std::unordered_map<Vector, std::string, VectorHasher>>(grassTiles, grassTiles.end()), tileSorter);
-
-    for (auto& pair : grassTiles)
-    {
-        pair.second = "sand";
-    }
-
 }
 
 

@@ -17,12 +17,12 @@ Map::Map(const sf::View& view, Player& player, const Vector& center, const Vecto
     ,   center_(center)
     ,   chunkSize_(chunkSize)
     ,   tileSize_(tileSize)
-    ,   perlinNoise_(rand())
+    ,   terrainGenerator_(rand())
 {
 
     loadTextures();
 
-    chunks_.emplace(center, std::make_unique<Chunk>(textures_["MAP"], perlinNoise_, center, chunkSize_, tileSize_));
+    chunks_.emplace(center, std::make_unique<Chunk>(textures_["MAP"], terrainGenerator_, center, chunkSize_, tileSize_));
     centerChunk_ = chunks_.at(center).get();
 }
 
@@ -236,7 +236,7 @@ void Map::generateChunks()
  */
 void Map::generateChunk(const Vector& position)
 {
-    chunks_.emplace(position, std::make_unique<Chunk>(textures_["MAP"], perlinNoise_, position, chunkSize_, tileSize_));
+    chunks_.emplace(position, std::make_unique<Chunk>(textures_["MAP"], terrainGenerator_, position, chunkSize_, tileSize_));
 }
 
 /**

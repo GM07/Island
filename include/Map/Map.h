@@ -2,8 +2,11 @@
 #define MAP_H
 
 #include "../Drawable.h"
-#include "Chunk.h"
+
 #include "../Entities/Player.h"
+
+#include "Chunk.h"
+#include "TerrainGenerator.h"
 
 class Map
     :   public Drawable
@@ -50,7 +53,7 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<sf::Texture>> textures_;
 
-    PerlinNoise perlinNoise_;
+    TerrainGenerator terrainGenerator_;
 
 };
 
