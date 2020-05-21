@@ -155,7 +155,6 @@ std::unordered_map<Vector, std::string, VectorHasher> Chunk::tilesColliding(cons
     return tilesColliding;
 }
 
-
 /**
  * @brief Function that generates the chunk with perlin noise
  */
