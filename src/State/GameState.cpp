@@ -11,16 +11,22 @@ GameState::GameState(std::stack<std::unique_ptr<State>>& states, std::shared_ptr
     :   State(states, window, keys)
     
     ,   player_(
-            std::make_shared<Player>(Vector(0, 0),     // Position
+            std::make_shared<Player>(Vector(0, 0),      // Position
             Vector(PLAYER_SIZE),                        // Size
-            MovementComponents(400.0f, 29.0f, 5.0f)))   // Max velocity, acceleration, deceleration
+            MovementComponents(400.0f, 29.0f, 5.0f))    // Max velocity, acceleration, deceleration
+        )   
     
     ,   view_(
-            player_->getPosition().getAsVector2f(),                     // Center at the player's position
-            sf::Vector2f(window_->getSize().x, window_->getSize().y))   // Size of the window
+            (player_->getPosition() - player_->getSize() * 0.5f).getAsVector2f(),   // Center at the player's position
+            sf::Vector2f(window_->getSize().x, window_->getSize().y)                // Size of the window
+        )  
     
     ,   map_(view_, *player_, player_->getPosition())                    // Center of the map
     ,   pauseMenu_(window)
+    ,   inventoryBar_(
+            Vector(static_cast<float>(window_->getSize().x) / 2.0f - 16 * TileHandler::DEFAULT_SIZE / 2.0f, static_cast<float>(window_->getSize().y) - 4 * TileHandler::DEFAULT_SIZE).getAsVector2f(),
+            Vector(16 * TileHandler::DEFAULT_SIZE, 2 * TileHandler::DEFAULT_SIZE)
+        )
     ,   lastView_(window_->getView())
 {
 
@@ -82,6 +88,17 @@ void GameState::handlePausedKeyboardInputs()
 }
 
 /**
+ * @brief Function that handles the button's events
+ */
+void GameState::handleButtonEvents()
+{
+    if (pauseMenu_.isButtonPressed("QUIT"))
+    {
+        endState();
+    }
+}
+
+/**
  * @brief Function that updates the game state
  * @param dt    time since last frame
  */
@@ -95,6 +112,7 @@ void GameState::update(const float& dt)
         view_.setCenter(player_->getPosition().getAsVector2f());
         player_->update(dt);
         map_.update(dt);
+        inventoryBar_.update(dt);
 
         handleKeyboardInputs();
     }
@@ -123,9 +141,11 @@ void GameState::render(std::shared_ptr<sf::RenderWindow> target)
     player_->render(target);
     map_.renderOnTop(target);
 
+    window_->setView(lastView_);
+    inventoryBar_.render(target);
+
     if (paused_)
     {
-        window_->setView(lastView_);
         pauseMenu_.render(target);
     }
     
@@ -168,17 +188,6 @@ void GameState::loadPauseMenuTextures()
         throw("Error : Could not load quit button texture");
 
     textures_["DEFAULT_BUTTON"] = std::make_shared<sf::Texture>(texture);
-}
-
-/**
- * @brief Function that handles the button's events
- */
-void GameState::handleButtonEvents()
-{
-    if (pauseMenu_.isButtonPressed("QUIT"))
-    {
-        endState();
-    }
 }
 
 

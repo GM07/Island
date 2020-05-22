@@ -91,6 +91,22 @@ std::vector<Vector> Chunk::collide(const HitboxComponent& hitbox) const
 }
 
 /**
+ * @brief Function that returns the neighbours of a tile (order : b-t-r-l)
+ * @param position      Position of the tile
+ * @return              Array containing the neighbouring tiles
+ */
+std::array<Vector, 4> Chunk::getNeighbours(const Vector& position) const
+{
+    Vector bottom = position + Vector(0.0f, tileSize_.getY());
+    Vector top = position - Vector(0.0f, tileSize_.getY());
+    Vector right = position + Vector(tileSize_.getX(), 0.0f);
+    Vector left = position - Vector(tileSize_.getX(), 0.0f);
+
+    return { bottom, top, right, left };
+}
+    
+
+/**
  * brief Function that returns the global position of a certain tile
  * @param x             X coordinate in the chunk (in tiles)
  * @param y             Y coordinate in the chunk (in tiles)
@@ -134,7 +150,7 @@ sf::FloatRect Chunk::getRectangle() const
 }
 
 /**
- * @brief Function that returns every tiles colliding with a hitbox if the tiles are solid
+ * @brief Function that returns every tiles colliding with a hitbox
  * @param hitbox        Hitbox
  * @return              Tiles colliding
  */
@@ -172,7 +188,7 @@ void Chunk::initTerrain()
                 0);
             
             addTile(pos, value);
-            generateTrees(pos, value);
+            //generateTrees(pos, value);
         }
     }
 }
@@ -215,5 +231,4 @@ void Chunk::generateTrees(const Vector& position, const float& height)
         }
     }
 }
-
 

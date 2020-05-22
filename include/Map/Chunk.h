@@ -27,6 +27,7 @@ public:
 
     std::vector<Vector> collide(const HitboxComponent& hitbox) const;
 
+    std::array<Vector, 4> getNeighbours(const Vector& position) const;
     Vector getPositionOfTile(std::size_t x, std::size_t y) const;
     std::string getTile(const Vector& globalPosition) const ;
     Vector getPosition() const;

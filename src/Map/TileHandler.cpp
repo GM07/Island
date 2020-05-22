@@ -87,7 +87,7 @@ sf::Sprite TileHandler::I_getSpriteFromChar(const std::string& blockID, std::sha
  */
 bool TileHandler::I_isBlockSolid(const std::string& blockID) const
 {
-    return blockID == "WATER";
+    return blockID == "WATER" || blockID == "big_tree";
 }
 
 /**
