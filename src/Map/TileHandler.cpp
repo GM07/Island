@@ -2,7 +2,7 @@
 #include "../../include/Map/TileHandler.h"
 
 const float TileHandler::DEFAULT_SIZE = 32.0f;
-const float TileHandler::TEXTURE_SIZE = 128.0f;
+const float TileHandler::TEXTURE_SIZE = 32.0f;
 float TileHandler::SCALE_FACTOR_TEXTURE_SPRITE = TileHandler::TEXTURE_SIZE / TileHandler::DEFAULT_SIZE;
 const std::size_t TileHandler::NUMBER_OF_TEXTURES = 3;
 
@@ -39,7 +39,7 @@ TileHandler::TileHandler()
  */
 void TileHandler::loadCoordinates()
 {
-    std::ifstream file("config/block_id.ini");
+    std::ifstream file("config/block_id_mbm.ini");
     std::string id;
     int x, y;
     
@@ -87,7 +87,7 @@ sf::Sprite TileHandler::I_getSpriteFromChar(const std::string& blockID, std::sha
  */
 bool TileHandler::I_isBlockSolid(const std::string& blockID) const
 {
-    return blockID == "WATER" || blockID == "big_tree";
+    return blockID == "water" || blockID == "big_tree";
 }
 
 /**
@@ -96,9 +96,14 @@ bool TileHandler::I_isBlockSolid(const std::string& blockID) const
  */
 Vector TileHandler::getTextureSize(const std::string& blockID) const
 {
-    if (blockID == "big_tree")
+    if (blockID == "tree")
     {
         return Vector(1, 2);    
+    }
+
+    if (blockID == "big_tree")
+    {
+        return Vector(2, 3);
     }
 
     return Vector(1, 1);
@@ -110,7 +115,9 @@ Vector TileHandler::getTextureSize(const std::string& blockID) const
 Vector TileHandler::getTextureCoordinates(const std::string& blockID) const
 {
     if (TileHandler::coordinates_.find(blockID) == coordinates_.end())
+    {
         throw TileNotFound("Texture not found");
+    }
 
     return TileHandler::coordinates_.at(blockID);
 }

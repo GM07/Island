@@ -18,6 +18,7 @@ Chunk::Chunk(std::shared_ptr<sf::Texture> textureSheet, TerrainGenerator& terrai
     ,   textureSheet_(textureSheet)
 {
     initTerrain();
+    generateSmoothTextures();
 }
 
 /**
@@ -77,14 +78,11 @@ void Chunk::renderOnTop(std::shared_ptr<sf::RenderWindow> target)
  */
 std::vector<Vector> Chunk::collide(const HitboxComponent& hitbox) const
 {
-    std::unordered_map<Vector, std::string, VectorHasher> tiles = tilesColliding(hitbox);
+    std::unordered_map<Vector, sf::FloatRect, VectorHasher> tiles = tilesColliding(hitbox);
     std::vector<Vector> offsets;
     for (const auto& tile : tiles)
     {
-        if (TileHandler::isBlockSolid(tile.second))
-        {
-            offsets.push_back(CollisionHandler::collide(hitbox, sf::FloatRect(tile.first.getAsVector2f(), tileSize_.getAsVector2f())));
-        }
+        offsets.push_back(CollisionHandler::collide(hitbox, tile.second));
     }
 
     return offsets;
@@ -154,13 +152,12 @@ sf::FloatRect Chunk::getRectangle() const
  * @param hitbox        Hitbox
  * @return              Tiles colliding
  */
-std::unordered_map<Vector, std::string, VectorHasher> Chunk::tilesColliding(const HitboxComponent& hitbox) const
+std::unordered_map<Vector, sf::FloatRect, VectorHasher> Chunk::tilesColliding(const HitboxComponent& hitbox) const
 {   
-    std::unordered_map<Vector, std::string, VectorHasher> tilesColliding;
-    for (const auto& tile : tiles_)
+    std::unordered_map<Vector, sf::FloatRect, VectorHasher> tilesColliding;
+    for (const auto& tile : blocks_)
     {
-        sf::FloatRect tileRect(tile.first.getAsVector2f(), tileSize_.getAsVector2f());
-        if (hitbox.isIntersecting(tileRect))
+        if (hitbox.isIntersecting(tile.second))
         {
             tilesColliding.emplace(tile.first, tile.second);
         }
@@ -181,14 +178,11 @@ void Chunk::initTerrain()
         for (std::size_t j = 0; static_cast<float>(j) < size_.getY(); ++j)
         {
             Vector pos = getPositionOfTile(i, j);
-
-            float value = terrainGenerator_.getMapGenerator().noise(
-                pos.getX() / (tileSize_.getX() * 50.0f), 
-                pos.getY() / (tileSize_.getY() * 50.0f), 
-                0);
             
-            addTile(pos, value);
-            //generateTrees(pos, value);
+            Vector terrainPosition = Vector(pos.getX() / (tileSize_.getX() * 75.0f), pos.getY() / (tileSize_.getY() * 75.0f));
+
+            addTile(pos, terrainGenerator_.mapValue(terrainPosition));            
+            generateTrees(pos, terrainGenerator_.treeValue(terrainPosition));
         }
     }
 }
@@ -201,14 +195,35 @@ void Chunk::initTerrain()
 void Chunk::addTile(const Vector& position, const float& height)
 {
 
-    if (height <= -0.1f)
-        tiles_.emplace(position, "WATER");
-    else if (height <= 0.05f)
+    if (height <= TerrainGenerator::WATER_HEIGHT)
+    {
+        tiles_.emplace(position, "water");
+        blocks_.emplace(position, sf::FloatRect(position.getAsVector2f(), tileSize_.getAsVector2f()));
+    }
+    else if (height <= TerrainGenerator::SAND_HEIGHT)
+    {
         tiles_.emplace(position, "sand");
-    else if (height <= 1.0f)
-        tiles_.emplace(position, "grass");
+    }
+    else if (height <= TerrainGenerator::GRASS_HEIGHT)
+    {
+        // Normal grass
+        tiles_.emplace(position, "grass_0");
+    } else if (height <= 0.4f)
+    {
+        tiles_.emplace(position, "grass_1");
+        
+    }
+    else if (height <= 0.5f)
+    {
+        // Normal grass
+        tiles_.emplace(position, "grass_2");
+    } else if (height <= 1.0f)
+    {
+        tiles_.emplace(position, "grass_3");
+        
+    }
     else 
-        tiles_.emplace(position, "grass");
+        tiles_.emplace(position, "grass_0");
 }
 
 /**
@@ -218,7 +233,7 @@ void Chunk::addTile(const Vector& position, const float& height)
  */
 void Chunk::generateTrees(const Vector& position, const float& height)
 {
-    if (height > 0.2f && static_cast<int>(height * 20.0f) % 2 == 0)
+    if (height != 0.0f && static_cast<int>(height * 100) % 50 == 0)
     {
         // Generate the tree
         Vector bottomPos = position + Vector(0.0f, tileSize_.getY());
@@ -227,8 +242,73 @@ void Chunk::generateTrees(const Vector& position, const float& height)
         if (nature_.find(bottomPos) == nature_.end() &&
             nature_.find(topPos) == nature_.end())
         {
-            nature_.emplace(position, "big_tree");
+            nature_.emplace(position, "tree");
+            blocks_.emplace(position, sf::FloatRect(bottomPos.getAsVector2f(), tileSize_.getAsVector2f()));
         }
+    }
+
+    else if (height != 0.0f && static_cast<int>(height * 100) % 6 == 0)
+    {
+        nature_.emplace(position, "bush");
+        blocks_.emplace(position, sf::FloatRect(position.getAsVector2f(), tileSize_.getAsVector2f()));
+
+    }
+
+    else if (height != 0.0f && static_cast<int>(height * 100) % 20 == 0)
+    {
+        nature_.emplace(position, "big_tree");
+        blocks_.emplace(position, sf::FloatRect((position + Vector(0.5f * tileSize_.getX(), 2.0f * tileSize_.getY())).getAsVector2f(), tileSize_.getAsVector2f()));
+
     }
 }
 
+/**
+ * @brief Function that generates smooth transitions between tiles
+ */
+void Chunk::generateSmoothTextures() 
+{
+    for (auto& tile : tiles_)
+    {
+        if (tile.second == "sand")
+        {
+            std::array<Vector, 4> neighbours = getNeighbours(tile.first);
+            std::array<std::string, 4> tiles;
+
+            std::transform(neighbours.begin(), neighbours.end(), tiles.begin(), [&] (const Vector& v) {
+                const auto& tile = tiles_.find(v);
+                if (tile != tiles_.end())
+                {
+                    return tile->second; 
+                }
+                return std::string("INVALID");
+            });
+
+            std::string newTile = "sand";
+
+            if (tiles[0] == "water")
+            {
+                // Bottom tile
+                newTile += "_down";
+            }
+            else if (tiles[1] == "water")
+            {
+                // Top tile
+                newTile += "_up";
+            }
+
+            if (tiles[2] == "water")
+            {
+                // Right tile
+                newTile += "_right";
+            }
+            else if (tiles[3] == "water")
+            {
+                // Left tile
+                newTile += "_left";
+            }
+
+            tiles_[tile.first] = newTile;
+        }
+    }
+
+}

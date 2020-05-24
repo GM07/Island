@@ -89,7 +89,7 @@ void Map::loadTextures()
     sf::Texture texture;
 
     // Player texture
-    if (!texture.loadFromFile("resources/game/map/sprite_sheet.png"))
+    if (!texture.loadFromFile("resources/game/map/sprite_sheet_mbm.png"))
         throw("Error : Could not load player's sprite sheet texture");
 
     textures_["MAP"] = std::make_shared<sf::Texture>(texture);

@@ -2,16 +2,22 @@
 #define TERRAIN_GENERATOR_H
 
 #include "../Math/PerlinNoise.h"
+#include "../Math/Vector.h"
 
 class TerrainGenerator
 {
 public:
+
+    static constexpr float WATER_HEIGHT = -0.1f;
+    static constexpr float SAND_HEIGHT = 0.05f;
+    static constexpr float GRASS_HEIGHT = 0.3f;
+
     TerrainGenerator(int seed);
     virtual ~TerrainGenerator();
 
     // Getters
-    const PerlinNoise& getMapGenerator() const;
-    const PerlinNoise& getTreeGenerator() const;
+    float mapValue(const Vector& position) const;
+    float treeValue(const Vector& position) const;
 
 private:
     PerlinNoise mapGenerator_;

@@ -13,6 +13,7 @@ class Chunk
 {
 
 public:
+
     static const float DEFAULT_SIZE;
 
     Chunk(std::shared_ptr<sf::Texture> textureSheet, 
@@ -35,10 +36,11 @@ public:
 
 private:
 
-    std::unordered_map<Vector, std::string, VectorHasher> tilesColliding(const HitboxComponent& hitbox) const;
+    std::unordered_map<Vector, sf::FloatRect, VectorHasher> tilesColliding(const HitboxComponent& hitbox) const;
     void initTerrain();
     void addTile(const Vector& position, const float& height);
     void generateTrees(const Vector& position, const float& height);
+    void generateSmoothTextures();
 
     TerrainGenerator& terrainGenerator_;
     Vector position_;
@@ -46,9 +48,9 @@ private:
     Vector tileSize_;
     std::shared_ptr<sf::Texture> textureSheet_;
 
-    std::unordered_multimap<Vector, std::string, VectorHasher> tiles_;
-    std::unordered_multimap<Vector, std::string, VectorHasher> nature_;
-
+    std::unordered_map<Vector, std::string, VectorHasher> tiles_;
+    std::unordered_map<Vector, std::string, VectorHasher> nature_;
+    std::unordered_map<Vector, sf::FloatRect, VectorHasher> blocks_;
 };
 
 

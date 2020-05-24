@@ -21,19 +21,27 @@ TerrainGenerator::~TerrainGenerator()
 }
 
 /**
- * @brief Function that returns the map generator
- * @return Map generator
+ * @brief Function that generates the map
+ * @param position      Position of the tile
+ * @return value of the tile at a certain position
  */
-const PerlinNoise& TerrainGenerator::getMapGenerator() const
+float TerrainGenerator::mapValue(const Vector& position) const
 {
-    return mapGenerator_;
+    return mapGenerator_.noise(position.getX(), position.getY(), 0.0);
 }
 
 /**
  * @brief Function that returns the map generator
  * @return Map generator
  */
-const PerlinNoise& TerrainGenerator::getTreeGenerator() const
+float TerrainGenerator::treeValue(const Vector& position) const
 {
-    return treeGenerator_;
+    float terrainCoefficient = mapValue(position);
+
+    if (terrainCoefficient < GRASS_HEIGHT)
+    {
+        return 0.0f;
+    }
+
+    return terrainCoefficient + treeGenerator_.noise(position.getX(), position.getY(), 0.0);
 }
