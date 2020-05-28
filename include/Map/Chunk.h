@@ -26,20 +26,23 @@ public:
     virtual void render(std::shared_ptr<sf::RenderWindow> target = nullptr);
     virtual void renderOnTop(std::shared_ptr<sf::RenderWindow> target = nullptr);
 
-    std::vector<Vector> collide(const HitboxComponent& hitbox) const;
+    std::vector<Vector> collide(const HitboxComponent& hitbox);
 
     std::array<Vector, 4> getNeighbours(const Vector& position) const;
     Vector getPositionOfTile(std::size_t x, std::size_t y) const;
     std::string getTile(const Vector& globalPosition) const ;
     Vector getPosition() const;
     sf::FloatRect getRectangle() const;
+    const Vector& getSize() const;
+    const Vector& getTileSize() const;
 
 private:
 
-    std::unordered_map<Vector, sf::FloatRect, VectorHasher> tilesColliding(const HitboxComponent& hitbox) const;
+    std::unordered_map<Vector, sf::FloatRect, VectorHasher> blocksColliding(const HitboxComponent& hitbox) const;
+    std::unordered_map<Vector, std::string, VectorHasher> naturalElementsColliding(const HitboxComponent& hitbox) const;
     void initTerrain();
     void addTile(const Vector& position, const float& height);
-    void generateTrees(const Vector& position, const float& height);
+    void generateNaturalElements(const Vector& position, const int height);
     void generateSmoothTextures();
 
     TerrainGenerator& terrainGenerator_;
@@ -48,9 +51,9 @@ private:
     Vector tileSize_;
     std::shared_ptr<sf::Texture> textureSheet_;
 
-    std::unordered_map<Vector, std::string, VectorHasher> tiles_;
+    std::unordered_map<Vector, std::string, VectorHasher, VectorEqual> tiles_;
     std::unordered_map<Vector, std::string, VectorHasher> nature_;
-    std::unordered_map<Vector, sf::FloatRect, VectorHasher> blocks_;
+    std::unordered_map<Vector, sf::FloatRect, VectorHasher, VectorEqual> blocks_;
 };
 
 

@@ -67,4 +67,25 @@ public:
 
 };
 
+class VectorEqual
+{
+public:
+    std::size_t operator()(const Vector& v1, const Vector& v2) const
+    {
+        return v1.getX() == v2.getX() && v1.getY() && v2.getY();
+    }
+
+
+};
+
+class VectorSorterByY
+{
+public:
+    bool operator()(const Vector& v1, const Vector& v2)
+    {
+        return v1.getY() < v2.getY();
+    }
+};
+
+
 #endif

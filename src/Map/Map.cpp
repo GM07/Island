@@ -141,8 +141,9 @@ void Map::collide()
     const HitboxComponent& hitbox = player_.getHitbox();
     std::unordered_set<const Chunk*> chunks = chunksColliding(hitbox);
 
-    for (const Chunk* chunk : chunks)
+    for (const Chunk* c : chunks)
     {
+        Chunk* chunk = const_cast<Chunk*>(c);
         std::vector<Vector> offsets = chunk->collide(hitbox);
         
         for (const Vector& offset : offsets) 

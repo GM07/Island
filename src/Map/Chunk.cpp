@@ -18,7 +18,7 @@ Chunk::Chunk(std::shared_ptr<sf::Texture> textureSheet, TerrainGenerator& terrai
     ,   textureSheet_(textureSheet)
 {
     initTerrain();
-    generateSmoothTextures();
+    //generateSmoothTextures();
 }
 
 /**
@@ -76,13 +76,24 @@ void Chunk::renderOnTop(std::shared_ptr<sf::RenderWindow> target)
  * @param hitbox        Hitbox
  * @return              Push that must be applied to the hitbox
  */
-std::vector<Vector> Chunk::collide(const HitboxComponent& hitbox) const
+std::vector<Vector> Chunk::collide(const HitboxComponent& hitbox)
 {
-    std::unordered_map<Vector, sf::FloatRect, VectorHasher> tiles = tilesColliding(hitbox);
+    // Collisions with solid blocks
+    std::unordered_map<Vector, sf::FloatRect, VectorHasher> blocks = blocksColliding(hitbox);
     std::vector<Vector> offsets;
+    for (const auto& block : blocks)
+    {
+        offsets.push_back(CollisionHandler::collide(hitbox, block.second));
+    }
+
+    // Collisions with tiles
+    std::unordered_map<Vector, std::string, VectorHasher> tiles = naturalElementsColliding(hitbox);
     for (const auto& tile : tiles)
     {
-        offsets.push_back(CollisionHandler::collide(hitbox, tile.second));
+        if (tile.second == "bush")
+        {
+            nature_.erase(tile.first);
+        }
     }
 
     return offsets;
@@ -148,16 +159,53 @@ sf::FloatRect Chunk::getRectangle() const
 }
 
 /**
+ * @brief Function that returns the size of a chunk
+ * @return Size of a chunk
+ */
+const Vector& Chunk::getSize() const
+{
+    return size_;
+}
+
+/**
+ * @brief Function that returns the number of tiles in a chunk
+ * @return Number of tiles in a chunk
+ */
+const Vector& Chunk::getTileSize() const
+{
+    return tileSize_;
+}
+
+/**
  * @brief Function that returns every tiles colliding with a hitbox
  * @param hitbox        Hitbox
  * @return              Tiles colliding
  */
-std::unordered_map<Vector, sf::FloatRect, VectorHasher> Chunk::tilesColliding(const HitboxComponent& hitbox) const
+std::unordered_map<Vector, sf::FloatRect, VectorHasher> Chunk::blocksColliding(const HitboxComponent& hitbox) const
 {   
     std::unordered_map<Vector, sf::FloatRect, VectorHasher> tilesColliding;
     for (const auto& tile : blocks_)
     {
         if (hitbox.isIntersecting(tile.second))
+        {
+            tilesColliding.emplace(tile.first, tile.second);
+        }
+    }
+
+    return tilesColliding;
+}
+
+/**
+ * @brief Function that returns every tiles colliding with a hitbox
+ * @param hitbox        Hitbox
+ * @return              Tiles colliding
+ */
+std::unordered_map<Vector, std::string, VectorHasher> Chunk::naturalElementsColliding(const HitboxComponent& hitbox) const
+{   
+    std::unordered_map<Vector, std::string, VectorHasher> tilesColliding;
+    for (const auto& tile : nature_)
+    {
+        if (hitbox.isIntersecting(sf::FloatRect(tile.first.getAsVector2f(), tileSize_.getAsVector2f())))
         {
             tilesColliding.emplace(tile.first, tile.second);
         }
@@ -179,10 +227,14 @@ void Chunk::initTerrain()
         {
             Vector pos = getPositionOfTile(i, j);
             
-            Vector terrainPosition = Vector(pos.getX() / (tileSize_.getX() * 75.0f), pos.getY() / (tileSize_.getY() * 75.0f));
+            Vector terrainPosition = Vector(pos.getX() / (tileSize_.getX() * 64.0f), pos.getY() / (tileSize_.getY() * 64.0f));
 
-            addTile(pos, terrainGenerator_.mapValue(terrainPosition));            
-            generateTrees(pos, terrainGenerator_.treeValue(terrainPosition));
+            float value = terrainGenerator_.mapValue(terrainPosition);
+
+            addTile(pos, terrainGenerator_.mapValue(terrainPosition));   
+
+            if (value >= TerrainGenerator::GRASS_HEIGHT)
+                generateNaturalElements(pos, terrainGenerator_.generateNaturalElement(pos));
         }
     }
 }
@@ -231,35 +283,28 @@ void Chunk::addTile(const Vector& position, const float& height)
  * @param position      Position of the tree
  * @param height         Height used to determine if a tree can be added or not
  */
-void Chunk::generateTrees(const Vector& position, const float& height)
+void Chunk::generateNaturalElements(const Vector& position, int type)
 {
-    if (height != 0.0f && static_cast<int>(height * 100) % 50 == 0)
+    switch (type) 
     {
-        // Generate the tree
-        Vector bottomPos = position + Vector(0.0f, tileSize_.getY());
-        Vector topPos = position - Vector(0.0f, tileSize_.getY());
-
-        if (nature_.find(bottomPos) == nature_.end() &&
-            nature_.find(topPos) == nature_.end())
-        {
+        case 1:
+            nature_.try_emplace(position, "bush");
+            break;
+        
+        case 2:
             nature_.emplace(position, "tree");
-            blocks_.emplace(position, sf::FloatRect(bottomPos.getAsVector2f(), tileSize_.getAsVector2f()));
-        }
+            blocks_.emplace(position, sf::FloatRect((position + Vector(0.0f, tileSize_.getY())).getAsVector2f(), tileSize_.getAsVector2f()));
+            break;
+
+        case 3:
+            nature_.emplace(position, "big_tree");
+            blocks_.emplace(position, sf::FloatRect((position + Vector(0.5f * tileSize_.getX(), 2.0f * tileSize_.getY())).getAsVector2f(), tileSize_.getAsVector2f()));
+            break;
+
+        default:
+            break;
     }
 
-    else if (height != 0.0f && static_cast<int>(height * 100) % 6 == 0)
-    {
-        nature_.emplace(position, "bush");
-        blocks_.emplace(position, sf::FloatRect(position.getAsVector2f(), tileSize_.getAsVector2f()));
-
-    }
-
-    else if (height != 0.0f && static_cast<int>(height * 100) % 20 == 0)
-    {
-        nature_.emplace(position, "big_tree");
-        blocks_.emplace(position, sf::FloatRect((position + Vector(0.5f * tileSize_.getX(), 2.0f * tileSize_.getY())).getAsVector2f(), tileSize_.getAsVector2f()));
-
-    }
 }
 
 /**

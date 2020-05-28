@@ -21,11 +21,19 @@ GameState::GameState(std::stack<std::unique_ptr<State>>& states, std::shared_ptr
             sf::Vector2f(window_->getSize().x, window_->getSize().y)                // Size of the window
         )  
     
-    ,   map_(view_, *player_, player_->getPosition())                    // Center of the map
+    ,   map_(view_, *player_, player_->getPosition())   // Center of the map
     ,   pauseMenu_(window)
     ,   inventoryBar_(
             Vector(static_cast<float>(window_->getSize().x) / 2.0f - 16 * TileHandler::DEFAULT_SIZE / 2.0f, static_cast<float>(window_->getSize().y) - 4 * TileHandler::DEFAULT_SIZE).getAsVector2f(),
             Vector(16 * TileHandler::DEFAULT_SIZE, 2 * TileHandler::DEFAULT_SIZE)
+        )
+    ,   demonSpawner_(
+            player_->getCenter(), 32 * TileHandler::DEFAULT_SIZE, Demon(
+                Vector(0.0f, 0.0f),
+                Vector(PLAYER_SIZE),
+                player_->getCenter(),
+                MovementComponents(300.0f, 29.0f, 5.0f)
+            ), 5
         )
     ,   lastView_(window_->getView())
 {
@@ -115,6 +123,8 @@ void GameState::update(const float& dt)
         inventoryBar_.update(dt);
 
         handleKeyboardInputs();
+
+        demonSpawner_.update(dt);
     }
     else
     {
@@ -138,7 +148,15 @@ void GameState::render(std::shared_ptr<sf::RenderWindow> target)
     window_->setView(view_);
 
     map_.render(target);
+
+    // Rendering entities
+
     player_->render(target);
+
+    demonSpawner_.render(target);
+
+    // End of entities render
+
     map_.renderOnTop(target);
 
     window_->setView(lastView_);
@@ -158,6 +176,7 @@ void GameState::loadTextures()
 {
     map_.loadTextures();
     loadPlayerTextures();
+    loadEntitiesTexture();
     loadPauseMenuTextures();
 }
 
@@ -176,6 +195,20 @@ void GameState::loadPlayerTextures()
 
 }
 
+/**
+ * @brief Function that loads the textures needed by the player
+ */
+void GameState::loadEntitiesTexture() 
+{
+    sf::Texture texture;
+
+    // Player texture
+    if (!texture.loadFromFile("resources/game/enemy_sprite_sheet.png"))
+        throw("Error : Could not load player's sprite sheet texture");
+
+    textures_["DEMON"] = std::make_shared<sf::Texture>(texture);
+
+}
 
 /**
  * @brief Function that loads the textures needed by the pause menu
@@ -190,13 +223,14 @@ void GameState::loadPauseMenuTextures()
     textures_["DEFAULT_BUTTON"] = std::make_shared<sf::Texture>(texture);
 }
 
-
 /**
  * @brief Function that initializes the entities
  */
 void GameState::initEntities()
 {
     player_->addTexture(textures_["PLAYER_SPRITE_SHEET"]);
+
+    demonSpawner_.addTexture(textures_["DEMON"]);
 }
 
 /**

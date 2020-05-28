@@ -7,7 +7,7 @@
  */
 TerrainGenerator::TerrainGenerator(int seed)
     :   mapGenerator_(seed)
-    ,   treeGenerator_(seed)
+    ,   treeGenerator_(seed ^ (seed + 1))
 {
 
 }
@@ -34,14 +34,18 @@ float TerrainGenerator::mapValue(const Vector& position) const
  * @brief Function that returns the map generator
  * @return Map generator
  */
-float TerrainGenerator::treeValue(const Vector& position) const
+int TerrainGenerator::generateNaturalElement(const Vector& position) const
 {
-    float terrainCoefficient = mapValue(position);
+    srand(hash(position));
+    int value = rand() % 80;
+    
+    return value;
+}
 
-    if (terrainCoefficient < GRASS_HEIGHT)
-    {
-        return 0.0f;
-    }
-
-    return terrainCoefficient + treeGenerator_.noise(position.getX(), position.getY(), 0.0);
+/**
+ * @brief Hashing function for pseudo-random number generator
+ */
+unsigned int TerrainGenerator::hash(const Vector& position) const
+{
+    return static_cast<unsigned int>(static_cast<int>(position.getX() * position.getY()) ^ (static_cast<int>(position.getY()) << 1));
 }

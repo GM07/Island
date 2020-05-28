@@ -9,13 +9,13 @@ class Player
 
 public:
 
-    Player(Vector position, Vector size, MovementComponents movementComponents);
+    Player(const Vector& position, const Vector& size, MovementComponents movementComponents);
     virtual ~Player();
 
     virtual void update(const float& dt);
     virtual void render(std::shared_ptr<sf::RenderWindow> target);
     virtual void addTexture(std::shared_ptr<sf::Texture> texture_);
-
+    
 private:
 
     virtual void initComponents();
@@ -23,7 +23,6 @@ private:
     virtual void updateAnimations(const float& dt);
 
     bool attacking_;
-
 };
 
 #endif

@@ -32,6 +32,7 @@ void MovableEntity::updateMovement(const float& dt)
     validateMaxSpeed(velocity_);
     applyDeceleration(velocity_);
     position_ += velocity_ * dt;
+    center_ = position_ + size_ * 0.5f;
 
     // Updating things on screen
     rect_.setPosition(position_.getAsVector2f());
@@ -219,6 +220,10 @@ bool MovableEntity::isDirectionAvailable(Direction direction) const
 {
     return availableDirections[direction];
 }
+
+/**
+ * @brief Function that returns the center of the entity
+ */
 
 /**
  * @brief Method that changes the movement speed

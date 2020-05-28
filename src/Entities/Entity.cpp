@@ -22,6 +22,7 @@ Entity::Entity(Vector position, Vector size)
     :   position_(position)
     ,   size_(size)
 {
+    center_ = position_ + size_ * 0.5f;
     initShape();
 }
 
@@ -66,7 +67,7 @@ void Entity::createHitboxComponent(sf::Sprite& sprite, const Vector& offset, con
  * @brief Function that returns the entity's position
  * @return position
  */
-Vector Entity::getPosition() const
+const Vector& Entity::getPosition() const
 {
     return position_;
 }
@@ -75,9 +76,17 @@ Vector Entity::getPosition() const
  * @brief Function that returns the entity's size
  * @return size
  */
-Vector Entity::getSize() const
+const Vector& Entity::getSize() const
 {
     return size_;
+}
+
+/**
+ * @brief Function that returns the entity's center
+ */
+const Vector& Entity::getCenter() const
+{
+    return center_;
 }
 
 /**

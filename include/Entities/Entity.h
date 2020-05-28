@@ -22,9 +22,10 @@ public:
     virtual void createHitboxComponent(sf::Sprite& sprite, const Vector& offset, const Vector& size);
 
     // Getters
-    Vector getPosition() const;
-    Vector getSize() const;
+    const Vector& getPosition() const;
+    const Vector& getSize() const;
     const HitboxComponent& getHitbox() const;
+    const Vector& getCenter() const;
 
     // Setters
     void setPosition(const Vector& position);
@@ -34,6 +35,7 @@ protected:
 
     Vector position_;
     Vector size_;
+    Vector center_;
 
     // Components
     std::unique_ptr<AnimationComponent> animationComponent_;

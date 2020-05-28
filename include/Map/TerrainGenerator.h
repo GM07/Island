@@ -17,9 +17,12 @@ public:
 
     // Getters
     float mapValue(const Vector& position) const;
-    float treeValue(const Vector& position) const;
+    int generateNaturalElement(const Vector& position) const;
 
 private:
+
+    unsigned int hash(const Vector& position) const;
+
     PerlinNoise mapGenerator_;
     PerlinNoise treeGenerator_;
 };

@@ -3,6 +3,8 @@
 
 #include "State.h"
 #include "../Entities/Player.h"
+#include "../Entities/Demon.h"
+#include "../Entities/DemonSpawner.h"
 #include "../Menu/PauseMenu.h"
 #include "../Map/Map.h"
 #include "../HUD/InventoryBar.h"
@@ -29,6 +31,7 @@ public:
 private:
 
     virtual void loadPlayerTextures();
+    virtual void loadEntitiesTexture();
     virtual void loadPauseMenuTextures();
 
     virtual void initEntities();
@@ -41,7 +44,8 @@ private:
     Map map_;
     PauseMenu pauseMenu_;
     HUD::InventoryBar inventoryBar_;
-    
+    DemonSpawner demonSpawner_;
+
     sf::View lastView_;
 
 };

@@ -6,17 +6,19 @@
  * @param position              Position
  * @param size                  Size
  * @param movementComponents    Movement component of the player containing its acceleration and all
- * @param textureSheet          Texture sheet of the player
  */
-Player::Player(Vector position, Vector size, MovementComponents movementComponents)
+Player::Player(const Vector& position, const Vector& size, MovementComponents movementComponents)
     :   MovableEntity(position, size, movementComponents),
         attacking_(false)
 {
 
-    // Creating the hitbox component with an offset and a different size then the sprite
+    // Creating the hitbox component with an offset and a different size than the sprite
     createHitboxComponent(sprite_, Vector(16, 12), Vector(32, 52));
 }
 
+/**
+ * @brief Destructor
+ */
 Player::~Player()
 {
 
@@ -130,13 +132,13 @@ void Player::updateAnimations(const float& dt)
                 animationComponent_->playAnimation("MOVE_LEFT", dt, velocity_.getX(), movementComponents_.maxSpeed_);
                 break;
             case RIGHT:
-                animationComponent_->playAnimation("MOVE_RIGHT", dt);
+                animationComponent_->playAnimation("MOVE_RIGHT", dt, velocity_.getX(), movementComponents_.maxSpeed_);
                 break;
             case UP:
-                animationComponent_->playAnimation("MOVE_UP", dt);
+                animationComponent_->playAnimation("MOVE_UP", dt, velocity_.getY(), movementComponents_.maxSpeed_);
                 break;
             case DOWN:
-                animationComponent_->playAnimation("MOVE_DOWN", dt);
+                animationComponent_->playAnimation("MOVE_DOWN", dt, velocity_.getY(), movementComponents_.maxSpeed_);
                 break;
             default:
                 animationComponent_->playAnimation("IDLE", dt);
