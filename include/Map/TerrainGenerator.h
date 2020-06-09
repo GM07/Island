@@ -18,6 +18,7 @@ public:
     // Getters
     float mapValue(const Vector& position) const;
     int generateNaturalElement(const Vector& position) const;
+    int generateGrass(const Vector& position) const;
 
 private:
 
@@ -25,6 +26,7 @@ private:
 
     PerlinNoise mapGenerator_;
     PerlinNoise treeGenerator_;
+    PerlinNoise grassGenerator_;
 };
 
 

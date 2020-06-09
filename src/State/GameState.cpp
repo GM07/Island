@@ -92,7 +92,11 @@ void GameState::handleKeyboardInputs()
 void GameState::handlePausedKeyboardInputs()
 {
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key(keybinds_.at("PAUSE"))) && getKeyTime())
+    {
         unpause();  
+        view_.setCenter(player_->getPosition().getAsVector2f());
+        window_->setView(view_);
+    }
 }
 
 /**
@@ -119,7 +123,11 @@ void GameState::update(const float& dt)
     {
         view_.setCenter(player_->getPosition().getAsVector2f());
         player_->update(dt);
-        map_.update(dt);
+
+
+        if (!(player_->getVelocity() == Vector(0.0f)))
+            map_.update(dt);
+
         inventoryBar_.update(dt);
 
         handleKeyboardInputs();
@@ -146,7 +154,6 @@ void GameState::render(std::shared_ptr<sf::RenderWindow> target)
         target = window_;
 
     window_->setView(view_);
-
     map_.render(target);
 
     // Rendering entities
@@ -193,6 +200,11 @@ void GameState::loadPlayerTextures()
 
     textures_["PLAYER_SPRITE_SHEET"] = std::make_shared<sf::Texture>(texture);
 
+    if (!texture.loadFromFile("resources/game/player/sword.png"))
+        throw("Error : Could not load player's sprite sheet texture");
+
+    textures_["SWORD"] = std::make_shared<sf::Texture>(texture);
+
 }
 
 /**
@@ -229,6 +241,7 @@ void GameState::loadPauseMenuTextures()
 void GameState::initEntities()
 {
     player_->addTexture(textures_["PLAYER_SPRITE_SHEET"]);
+    player_->addSwordTexture(textures_["SWORD"]);
 
     demonSpawner_.addTexture(textures_["DEMON"]);
 }

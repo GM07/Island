@@ -36,6 +36,7 @@ private:
 
     float dt_;
     sf::Clock dtClock_;
+    sf::Clock fpsClock_;
 
     // States of the game
     std::stack<std::unique_ptr<State>> states;

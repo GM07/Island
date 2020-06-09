@@ -8,12 +8,13 @@
  * @param movementComponents    Movement component of the player containing its acceleration and all
  */
 Player::Player(const Vector& position, const Vector& size, MovementComponents movementComponents)
-    :   MovableEntity(position, size, movementComponents),
-        attacking_(false)
+    :   MovableEntity(position, size, movementComponents)
+    ,   attacking_(false)
+    ,   sword_(position, Vector(size / 2.0f), 40.0f, Vector(18.0f, 22.0f), sprite_)
 {
 
     // Creating the hitbox component with an offset and a different size than the sprite
-    createHitboxComponent(sprite_, Vector(16, 12), Vector(32, 52));
+    createHitboxComponent(sprite_, Vector(16, 12), Vector(32, 32));
 }
 
 /**
@@ -30,9 +31,16 @@ Player::~Player()
  */
 void Player::update(const float& dt)
 {
+    // Movement
     updateMovement(dt);
-    hitboxComponent_->update(dt);    
     updateAnimations(dt);
+
+    // Collisions
+    hitboxComponent_->update(dt);    
+
+    // Sword
+    sword_.setPosition(position_);
+    sword_.update(dt);
 }
 
 /**
@@ -41,8 +49,21 @@ void Player::update(const float& dt)
  */
 void Player::render(std::shared_ptr<sf::RenderWindow> target)
 {
-    target->draw(sprite_);
-    hitboxComponent_->render(target);
+    Direction direction = getDirection();
+    if (direction == DOWN || direction == RIGHT)
+    {
+        target->draw(sprite_);
+        sword_.render(target);
+    } else
+    {
+        sword_.render(target);
+        target->draw(sprite_);
+    }
+    
+
+
+    //hitboxComponent_->render(target);
+
 }
 
 /**
@@ -59,6 +80,15 @@ void Player::addTexture(std::shared_ptr<sf::Texture> texture_)
     // Adding the animations (walk, stand, ...)
     initializeAnimations();
 
+}
+
+/**
+ * @brief Function that adds a texture to the sword
+ * @param texture   Texture
+ */
+void Player::addSwordTexture(std::shared_ptr<sf::Texture> texture_)
+{
+    sword_.addTexture(texture_);
 }
 
 /**
@@ -120,13 +150,16 @@ void Player::initializeAnimations()
  */
 void Player::updateAnimations(const float& dt)
 {
+    Direction direction = getDirection();
+    sword_.setDirection(direction);
+
     // Priority animations
     if (attacking_)
     {
-           
+        
     }
     else {
-    switch (getDirection())
+    switch (direction)
         {
             case LEFT:
                 animationComponent_->playAnimation("MOVE_LEFT", dt, velocity_.getX(), movementComponents_.maxSpeed_);

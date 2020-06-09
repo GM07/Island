@@ -132,7 +132,7 @@ Vector Chunk::getPositionOfTile(std::size_t x, std::size_t y) const
  * @param globalPosition    Position of the tile
  * @return                  Tile
  */
-std::string Chunk::getTile(const Vector& globalPosition) const
+const std::string& Chunk::getTile(const Vector& globalPosition) const
 {
     Vector localPosition = globalPosition - position_;
     return tiles_.find(localPosition)->second;
@@ -231,7 +231,7 @@ void Chunk::initTerrain()
 
             float value = terrainGenerator_.mapValue(terrainPosition);
 
-            addTile(pos, terrainGenerator_.mapValue(terrainPosition));   
+            addTile(pos, value);   
 
             if (value >= TerrainGenerator::GRASS_HEIGHT)
                 generateNaturalElements(pos, terrainGenerator_.generateNaturalElement(pos));
@@ -259,23 +259,10 @@ void Chunk::addTile(const Vector& position, const float& height)
     else if (height <= TerrainGenerator::GRASS_HEIGHT)
     {
         // Normal grass
-        tiles_.emplace(position, "grass_0");
-    } else if (height <= 0.4f)
-    {
-        tiles_.emplace(position, "grass_1");
-        
-    }
-    else if (height <= 0.5f)
-    {
-        // Normal grass
-        tiles_.emplace(position, "grass_2");
-    } else if (height <= 1.0f)
-    {
-        tiles_.emplace(position, "grass_3");
-        
+        tiles_.emplace(position, "grass_" + std::to_string(terrainGenerator_.generateGrass(position)));
     }
     else 
-        tiles_.emplace(position, "grass_0");
+        tiles_.emplace(position, "grass_" + std::to_string(terrainGenerator_.generateGrass(position)));
 }
 
 /**

@@ -53,7 +53,12 @@ void Game::updateTime()
  */
 void Game::update() 
 {
-    //std::cout << "FPS : " << (1.0f / (dt_)) << std::endl;
+    if (fpsClock_.getElapsedTime().asSeconds() > 1.00)
+    {
+        std::cout << "FPS : " << (1.0f / (dt_)) << std::endl;
+        fpsClock_.restart();
+    }
+    
     handleEvents();
     
     if (!states.empty())

@@ -30,7 +30,7 @@ public:
 
     std::array<Vector, 4> getNeighbours(const Vector& position) const;
     Vector getPositionOfTile(std::size_t x, std::size_t y) const;
-    std::string getTile(const Vector& globalPosition) const ;
+    const std::string& getTile(const Vector& globalPosition) const ;
     Vector getPosition() const;
     sf::FloatRect getRectangle() const;
     const Vector& getSize() const;
@@ -52,7 +52,7 @@ private:
     std::shared_ptr<sf::Texture> textureSheet_;
 
     std::unordered_map<Vector, std::string, VectorHasher, VectorEqual> tiles_;
-    std::unordered_map<Vector, std::string, VectorHasher> nature_;
+    std::unordered_map<Vector, std::string, VectorHasher, VectorEqual> nature_;
     std::unordered_map<Vector, sf::FloatRect, VectorHasher, VectorEqual> blocks_;
 };
 

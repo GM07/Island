@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "MovableEntity.h"
+#include "Sword.h"
 
 class Player
     : public MovableEntity
@@ -15,7 +16,8 @@ public:
     virtual void update(const float& dt);
     virtual void render(std::shared_ptr<sf::RenderWindow> target);
     virtual void addTexture(std::shared_ptr<sf::Texture> texture_);
-    
+    virtual void addSwordTexture(std::shared_ptr<sf::Texture> texture_);
+
 private:
 
     virtual void initComponents();
@@ -23,6 +25,7 @@ private:
     virtual void updateAnimations(const float& dt);
 
     bool attacking_;
+    Sword sword_;
 };
 
 #endif

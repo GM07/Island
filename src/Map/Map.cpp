@@ -1,7 +1,7 @@
 #include "../../include/headers.h"
 #include "../../include/Map/Map.h"
 
-const float Map::CHUNK_RADIUS = 3.0f;
+const float Map::CHUNK_RADIUS = 2.0f;
 
 /**
  * @brief Constructor
@@ -24,6 +24,9 @@ Map::Map(const sf::View& view, Player& player, const Vector& center, const Vecto
 
     chunks_.emplace(center, std::make_unique<Chunk>(textures_["MAP"], terrainGenerator_, center, chunkSize_, tileSize_));
     centerChunk_ = chunks_.at(center).get();
+    generateChunks();
+    generateChunks();
+    generateChunks();
 }
 
 /**
@@ -218,8 +221,7 @@ void Map::generateChunks()
 
         for (const Vector& pos : positions)
         {
-            if ((player_.getPosition() - pos).norm() < CHUNK_RADIUS * chunkSize_.norm() * tileSize_.norm() &&
-                !isChunkGenerated(pos))
+            if (!isChunkGenerated(pos) && (player_.getPosition() - pos).norm() < CHUNK_RADIUS * chunkSize_.norm() * tileSize_.norm())
             {
                 // Chunk must be added
                 generateChunk(pos);

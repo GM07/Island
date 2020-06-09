@@ -116,6 +116,7 @@ Vector TileHandler::getTextureCoordinates(const std::string& blockID) const
 {
     if (TileHandler::coordinates_.find(blockID) == coordinates_.end())
     {
+        std::cout << "Id : " << blockID << "\n";
         throw TileNotFound("Texture not found");
     }
 
