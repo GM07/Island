@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Entities/Demon.h"
+#include "../headers.h"
+#include "Demon.h"
 
 /**
  * @brief Constructor with parameters
@@ -10,7 +10,7 @@
  * @param texture               Texture of the demon
  */
 Demon::Demon(const Vector& position, const Vector& size, const Vector& attractor, MovementComponents movementComponents, std::shared_ptr<sf::Texture> texture)
-    :   MovableEntity(position, size, movementComponents)
+    :   MovableEntity(position, size, movementComponents, 50.0f)
     ,   attractor_(attractor)
 {
 
@@ -49,8 +49,13 @@ Demon::~Demon()
  */
 void Demon::update(const float& dt)
 {
-    attract();
+    if (!damaged_)
+    {
+        attract();
+    }
+    
     updateMovement(dt);
+    updateDamage();
     hitboxComponent_->update(dt); 
  
     updateAnimations(dt);
@@ -60,8 +65,19 @@ void Demon::update(const float& dt)
  * @brief Function that draws the Demon on the window
  * @param window    Window where the Demon will be drawn into
  */
-void Demon::render(std::shared_ptr<sf::RenderWindow> target)
+void Demon::render(std::shared_ptr<sf::RenderTarget> target)
 {
+    if (damaged_)
+    {
+        sprite_.setColor(sf::Color::Red);
+        hitboxComponent_->setOutlineColor(sf::Color::Yellow);
+    }
+    else
+    {
+        sprite_.setColor(sf::Color::White);
+        hitboxComponent_->setOutlineColor(sf::Color::Red);
+    }
+    
     target->draw(sprite_);
     hitboxComponent_->render(target);
 }

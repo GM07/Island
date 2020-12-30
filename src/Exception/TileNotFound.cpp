@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Exception/TileNotFound.h"
+#include "../headers.h"
+#include "TileNotFound.h"
 
 
 /**

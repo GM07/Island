@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/HUD/InventoryBar.h"
+#include "../headers.h"
+#include "InventoryBar.h"
 
 
 /**
@@ -38,7 +38,7 @@ void HUD::InventoryBar::update(const float& dt)
  * @brief Function that renders the bar
  * @param target    Where to draw the bar
  */
-void HUD::InventoryBar::render(std::shared_ptr<sf::RenderWindow> target)
+void HUD::InventoryBar::render(std::shared_ptr<sf::RenderTarget> target)
 {
     target->draw(background_);
     

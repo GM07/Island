@@ -6,16 +6,15 @@
 EXEC = app
 
 # Precompiled headers
-PCH_SRC = include/headers.h
-PCH_OUT = include/headers.h.gch
+PCH_SRC = src/headers.h
+PCH_OUT = src/headers.h.gch
 
 # Source files
 SRC_FOLDER = src
 SRC = $(shell find $(SRC_FOLDER) -name "*.cpp")
 
 # Header files
-INC_FOLDER = include
-INC = $(shell find $(INC_FOLDER) -name "*.h")
+INC = $(shell find $(SRC_FOLDER) -name "*.h")
 
 # Binary files
 BIN_FOLDER = bin
@@ -76,9 +75,8 @@ $(PCH_OUT) : $(PCH_SRC)
 	@$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 create :
-	@mkdir -p $(INC_FOLDER)/$(FOLDER)
 	@mkdir -p $(SRC_FOLDER)/$(FOLDER)
-	@touch $(INC_FOLDER)/$(FOLDER)/$(NAME).h
+	@touch $(SRC_FOLDER)/$(FOLDER)/$(NAME).h
 	@touch $(SRC_FOLDER)/$(FOLDER)/$(NAME).cpp
 	@mkdir -p $(BIN_FOLDER)/$(FOLDER)
 

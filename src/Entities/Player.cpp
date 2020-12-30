@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Entities/Player.h"
+#include "../headers.h"
+#include "Player.h"
 
 /**
  * @brief Constructor with parameters
@@ -10,7 +10,15 @@
 Player::Player(const Vector& position, const Vector& size, MovementComponents movementComponents)
     :   MovableEntity(position, size, movementComponents)
     ,   attacking_(false)
-    ,   sword_(position, Vector(size / 2.0f), 40.0f, Vector(18.0f, 22.0f), sprite_)
+    ,   sword_(position, Vector(size / 2.0f), 40.0f, 
+            {   
+                { LEFT, Vector(28.0f, 48.0f)  }, 
+                { RIGHT, Vector(24.0f, 48.0f)  }, 
+                { UP, Vector(44.0f, 48.0f)   }, 
+                { DOWN, Vector(21.0f, 48.0f) },
+                { NOT_MOVING, Vector(21.0f, 48.0f)} 
+            },
+            sprite_)
 {
 
     // Creating the hitbox component with an offset and a different size than the sprite
@@ -47,10 +55,10 @@ void Player::update(const float& dt)
  * @brief Function that draws the player on the window
  * @param window    Window where the player will be drawn into
  */
-void Player::render(std::shared_ptr<sf::RenderWindow> target)
+void Player::render(std::shared_ptr<sf::RenderTarget> target)
 {
     Direction direction = getDirection();
-    if (direction == DOWN || direction == RIGHT)
+    if (direction == DOWN || direction == RIGHT || direction == NOT_MOVING)
     {
         target->draw(sprite_);
         sword_.render(target);
@@ -59,8 +67,6 @@ void Player::render(std::shared_ptr<sf::RenderWindow> target)
         sword_.render(target);
         target->draw(sprite_);
     }
-    
-
 
     //hitboxComponent_->render(target);
 
@@ -89,14 +95,58 @@ void Player::addTexture(std::shared_ptr<sf::Texture> texture_)
 void Player::addSwordTexture(std::shared_ptr<sf::Texture> texture_)
 {
     sword_.addTexture(texture_);
+    sword_.initializeAnimations(attackSpeed_);
 }
 
 /**
- * @brief Function that initializes the player's components
+ * @brief Function that handles mouse events
+ * @param mousePosition     Mouse position
  */
-void Player::initComponents()
+void Player::handleMouseEvents(const Vector& mousePosition)
 {
+    sword_.handleMouseEvents(mousePosition);
+
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && damageClock_.getElapsedTime().asSeconds() >= attackSpeed_ * 2)
+    {
+        damageClock_.restart();
+        attack();
+    }
+
+    sword_.isActivated() = attacking_ = damageClock_.getElapsedTime().asSeconds() < attackSpeed_;
+
 }
+
+/**
+ * @brief Function that applies a force on the entity
+ * @param force         Force (only the direction is taken into account)
+ */
+void Player::applyForce(const Vector& force)
+{
+    if (force.getX() > 0)
+    {
+        availableDirections[LEFT] = false;
+    } else if (force.getX() < 0)
+    {
+        availableDirections[RIGHT] = false;
+    }
+
+    if (force.getY() > 0)
+    {
+        availableDirections[UP] = false;
+    } else if (force.getY() < 0)
+    {
+        availableDirections[DOWN] = false;
+    }
+
+    position_ += force;
+
+    if (force.getX() != 0)
+        velocity_.setX(0);
+
+    if (force.getY() != 0)
+        velocity_.setY(0);
+}
+
 
 /**
  * @brief Method that generates every animation needed the player
@@ -151,31 +201,31 @@ void Player::initializeAnimations()
 void Player::updateAnimations(const float& dt)
 {
     Direction direction = getDirection();
+
+    switch (direction)
+    {
+        case LEFT:
+            animationComponent_->playAnimation("MOVE_LEFT", dt, velocity_.getX(), movementComponents_.maxSpeed_);
+            break;
+        case RIGHT:
+            animationComponent_->playAnimation("MOVE_RIGHT", dt, velocity_.getX(), movementComponents_.maxSpeed_);
+            break;
+        case UP:
+            animationComponent_->playAnimation("MOVE_UP", dt, velocity_.getY(), movementComponents_.maxSpeed_);
+            break;
+        case DOWN:
+            animationComponent_->playAnimation("MOVE_DOWN", dt, velocity_.getY(), movementComponents_.maxSpeed_);
+            break;
+        default:
+            animationComponent_->playAnimation("IDLE", dt);
+            break;
+    }
+
     sword_.setDirection(direction);
 
-    // Priority animations
-    if (attacking_)
-    {
-        
-    }
-    else {
-    switch (direction)
-        {
-            case LEFT:
-                animationComponent_->playAnimation("MOVE_LEFT", dt, velocity_.getX(), movementComponents_.maxSpeed_);
-                break;
-            case RIGHT:
-                animationComponent_->playAnimation("MOVE_RIGHT", dt, velocity_.getX(), movementComponents_.maxSpeed_);
-                break;
-            case UP:
-                animationComponent_->playAnimation("MOVE_UP", dt, velocity_.getY(), movementComponents_.maxSpeed_);
-                break;
-            case DOWN:
-                animationComponent_->playAnimation("MOVE_DOWN", dt, velocity_.getY(), movementComponents_.maxSpeed_);
-                break;
-            default:
-                animationComponent_->playAnimation("IDLE", dt);
-                break;
-        }
-    }
+}
+
+void Player::addExperienceBar(HUD::ExperienceBar* experienceBar)
+{
+    experienceBar_ = experienceBar;
 }

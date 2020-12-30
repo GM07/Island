@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Map/TileHandler.h"
+#include "../headers.h"
+#include "TileHandler.h"
 
 const float TileHandler::DEFAULT_SIZE = 32.0f;
 const float TileHandler::TEXTURE_SIZE = 32.0f;

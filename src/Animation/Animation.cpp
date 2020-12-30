@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Animation/Animation.h"
+#include "../headers.h"
+#include "Animation.h"
 
 /**
  * @brief Constructor with parameters
@@ -25,8 +25,7 @@ Animation::Animation(sf::Sprite& sprite, sf::Texture& textureSheet, float animat
 }
 
 /**
- * @brief Method that plays the animation according
- * to the entity's speed
+ * @brief Method that plays the animation according to the entity's speed
  * @param dt                Time since last frame
  * @param percentageSpeed   Percentage of the max speed
  */

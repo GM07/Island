@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Animation/AnimationComponent.h"
+#include "../headers.h"
+#include "AnimationComponent.h"
 
 /**
  * @brief Constructor

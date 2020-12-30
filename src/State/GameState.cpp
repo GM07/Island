@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/State/GameState.h"
+#include "../headers.h"
+#include "GameState.h"
 
 /**
  * @brief Constructor with parameters
@@ -35,18 +35,28 @@ GameState::GameState(std::stack<std::unique_ptr<State>>& states, std::shared_ptr
                 MovementComponents(300.0f, 29.0f, 5.0f)
             ), 5
         )
+    ,   renderTexture_(std::make_shared<sf::RenderTexture>())
     ,   lastView_(window_->getView())
 {
 
     std::cout << "Game State created\n";
 
+    if (!font_.loadFromFile("fonts/basic_font.ttf"))
+        throw("Font in Game state couldn't be loaded");
+
+    initExperienceBar();
+
     player_->setPosition(Vector(0, 32));
 
-    initView();    
+    initView();
     loadTextures();
     initPauseMenu();
     initEntities();
     initKeybinds();
+
+    if (!renderTexture_->create(window_->getSize().x, window_->getSize().y))
+        throw("Render texture coudln't be loaded");
+
 }
 
 /**
@@ -111,6 +121,16 @@ void GameState::handleButtonEvents()
 }
 
 /**
+ * @brief Function that updates the mouse position
+ */
+void GameState::updateMousePosition()
+{
+    State::updateMousePosition();
+    mousePositionMap_ = Vector(player_->getPosition() - Vector(window_->getView().getSize() * 0.5f));
+    mousePositionMap_ += mousePositionScreen + Vector(32, 0);
+}
+
+/**
  * @brief Function that updates the game state
  * @param dt    time since last frame
  */
@@ -119,20 +139,25 @@ void GameState::update(const float& dt)
     updateMousePosition();
     updateKeyTime(dt);
 
+    DamageRenderer::update(dt);
+
     if (!paused_)
     {
-        view_.setCenter(player_->getPosition().getAsVector2f());
         player_->update(dt);
-
+        view_.move(player_->getVelocity().getX() * dt, player_->getVelocity().getY() * dt);
+        player_->handleMouseEvents(mousePositionMap_);
 
         if (!(player_->getVelocity() == Vector(0.0f)))
             map_.update(dt);
 
         inventoryBar_.update(dt);
+        experienceBar_->update(dt);
+
+        demonSpawner_.update(dt);
+        demonSpawner_.collide(*player_);
 
         handleKeyboardInputs();
 
-        demonSpawner_.update(dt);
     }
     else
     {
@@ -148,10 +173,10 @@ void GameState::update(const float& dt)
  *  @brief Function that renders the game state
  *  @param target   RenderWindow where the state will be drawn
  */
-void GameState::render(std::shared_ptr<sf::RenderWindow> target)
+void GameState::render(std::shared_ptr<sf::RenderTarget> target)
 {
     if (!target)
-        target = window_;
+        target = renderTexture_;
 
     window_->setView(view_);
     map_.render(target);
@@ -166,14 +191,19 @@ void GameState::render(std::shared_ptr<sf::RenderWindow> target)
 
     map_.renderOnTop(target);
 
+    DamageRenderer::render(target);
+
     window_->setView(lastView_);
     inventoryBar_.render(target);
+    experienceBar_->render(target);
 
     if (paused_)
     {
         pauseMenu_.render(target);
     }
     
+    renderSprite_.setTexture(renderTexture_->getTexture());
+    window_->draw(renderSprite_);
 }
 
 /**
@@ -200,10 +230,10 @@ void GameState::loadPlayerTextures()
 
     textures_["PLAYER_SPRITE_SHEET"] = std::make_shared<sf::Texture>(texture);
 
-    if (!texture.loadFromFile("resources/game/player/sword.png"))
+    if (!texture.loadFromFile("resources/game/player/sword_sprite_sheet.png"))
         throw("Error : Could not load player's sprite sheet texture");
 
-    textures_["SWORD"] = std::make_shared<sf::Texture>(texture);
+    textures_["SWORD_SPRITE_SHEET"] = std::make_shared<sf::Texture>(texture);
 
 }
 
@@ -241,7 +271,7 @@ void GameState::loadPauseMenuTextures()
 void GameState::initEntities()
 {
     player_->addTexture(textures_["PLAYER_SPRITE_SHEET"]);
-    player_->addSwordTexture(textures_["SWORD"]);
+    player_->addSwordTexture(textures_["SWORD_SPRITE_SHEET"]);
 
     demonSpawner_.addTexture(textures_["DEMON"]);
 }
@@ -281,10 +311,10 @@ void GameState::initKeybinds()
 void GameState::initPauseMenu()
 {
     gui::ColorButtonHandler handler(
-        sf::Color(255, 255, 255), // Normal
-        sf::Color(200, 200, 200), // Hover
-        sf::Color(51, 51, 51), // Clicked
-        sf::Color(100, 100, 100) // Off
+        sf::Color(255, 255, 255),   // Normal
+        sf::Color(200, 200, 200),   // Hover
+        sf::Color(51, 51, 51),      // Clicked
+        sf::Color(100, 100, 100)    // Off
     );
 
     pauseMenu_.addButton(
@@ -292,7 +322,7 @@ void GameState::initPauseMenu()
         Vector(
             static_cast<float>(window_->getSize().x) / 2.0f - gui::Button::BUTTON_SIZE_X / 2.0f,
             static_cast<float>(window_->getSize().y) - gui::Button::BUTTON_SIZE_Y - 32
-        ), // Position
+        ), 
         handler,
         "Quit"
     );
@@ -304,9 +334,22 @@ void GameState::initPauseMenu()
  */
 void GameState::initView()
 {
-    view_.zoom(1.0f);
-    window_->setView(view_);
+    view_.zoom(0.5f);
+    view_.setCenter(player_->getCenter().getAsVector2f());
+    renderTexture_->setView(view_);
 }
 
+/**
+ * @brief Function that initializes the experience bar
+ */
+void GameState::initExperienceBar()
+{
+    experienceBar_ = std::make_unique<HUD::ExperienceBar>(font_, Vector(512.0f, 8.0f), Vector(
+        window_->getSize().x / 2.0f - 512.0f / 2.0f,
+        16.0f
+    ));
+
+    player_->addExperienceBar(experienceBar_.get());
+}
 
 

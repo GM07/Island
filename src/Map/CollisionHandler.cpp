@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Map/CollisionHandler.h"
+#include "../headers.h"
+#include "CollisionHandler.h"
 
 
 /**

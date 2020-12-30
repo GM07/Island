@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/State/MainMenuState.h"
+#include "../headers.h"
+#include "MainMenuState.h"
 
 /**
  * @brief Constructor with parameters
@@ -7,10 +7,7 @@
  * @param window    Window where the state will be drawn into
  * @param keys      Keys supported by the game
  */
-MainMenuState::MainMenuState(
-    std::stack<std::unique_ptr<State>>& states, 
-    std::shared_ptr<sf::RenderWindow> window, 
-    std::map<std::string, int>* keys
+MainMenuState::MainMenuState(std::stack<std::unique_ptr<State>>& states,  std::shared_ptr<sf::RenderWindow> window,  std::map<std::string, int>* keys
 )
     :   State(states, window, keys)
 {
@@ -53,7 +50,7 @@ void MainMenuState::update(const float& dt)
  *  @brief Function that renders the game state
  *  @param target   RenderWindow where the state will be drawn
  */
-void MainMenuState::render(std::shared_ptr<sf::RenderWindow> target)
+void MainMenuState::render(std::shared_ptr<sf::RenderTarget> target)
 {
     if (!target)
         target = window_;
@@ -201,7 +198,7 @@ void MainMenuState::updateButtons(const float& dt)
 /**
  * @brief Function that renders the buttons of the state
  */
-void MainMenuState::renderButtons(std::shared_ptr<sf::RenderWindow> target)
+void MainMenuState::renderButtons(std::shared_ptr<sf::RenderTarget> target)
 {
 
     for (auto& button : buttons_)

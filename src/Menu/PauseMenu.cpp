@@ -1,10 +1,10 @@
-#include "../../include/headers.h"
-#include "../../include/Menu/PauseMenu.h"
+#include "../headers.h"
+#include "PauseMenu.h"
 
 /**
  * @brief Constructor
  */
-PauseMenu::PauseMenu(std::shared_ptr<sf::RenderWindow> window)
+PauseMenu::PauseMenu(std::shared_ptr<sf::RenderTarget> window)
     :   window_(window)
 {
     // Background
@@ -54,7 +54,7 @@ void PauseMenu::updateMousePosition(Vector mousePosition)
  *  @brief Method that renders the game state
  *  @param target   RenderWindow where the state will be drawn
  */
-void PauseMenu::render(std::shared_ptr<sf::RenderWindow> target)
+void PauseMenu::render(std::shared_ptr<sf::RenderTarget> target)
 {
     target->draw(background_);
 

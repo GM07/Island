@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/GUI/Button.h"
+#include "../headers.h"
+#include "Button.h"
 
 const float gui::Button::BUTTON_SIZE_X = 200;
 const float gui::Button::BUTTON_SIZE_Y = 50;
@@ -164,7 +164,7 @@ void gui::Button::update(const float& dt)
  *  @brief Function that renders the button
  *  @param target   RenderWindow where the state will be drawn
  */
-void gui::Button::render(std::shared_ptr<sf::RenderWindow> target)
+void gui::Button::render(std::shared_ptr<sf::RenderTarget> target)
 {
     if (target)
     {

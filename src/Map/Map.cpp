@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Map/Map.h"
+#include "../headers.h"
+#include "Map.h"
 
 const float Map::CHUNK_RADIUS = 2.0f;
 
@@ -55,7 +55,7 @@ void Map::update(const float& dt)
  * @brief Function that renders the tilea on top
  * @param target        Where to draw the tile
  */
-void Map::render(std::shared_ptr<sf::RenderWindow> target)
+void Map::render(std::shared_ptr<sf::RenderTarget> target)
 {
 
     for (const auto& chunk : chunks_)
@@ -71,7 +71,7 @@ void Map::render(std::shared_ptr<sf::RenderWindow> target)
  * @brief Function that renders the tiles on top
  * @param target        Where to draw the tile
  */
-void Map::renderOnTop(std::shared_ptr<sf::RenderWindow> target)
+void Map::renderOnTop(std::shared_ptr<sf::RenderTarget> target)
 {
 
     for (const auto& chunk : chunks_)

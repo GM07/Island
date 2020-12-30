@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/State/State.h"
+#include "../headers.h"
+#include "State.h"
 
 /**
  * @brief Constructor with parameters

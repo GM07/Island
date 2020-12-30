@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/State/SettingsState.h"
+#include "../headers.h"
+#include "SettingsState.h"
 
 /**
  * @brief Constructor with parameters
@@ -7,10 +7,7 @@
  * @param window    Window where the state will be drawn into
  * @param keys      Keys supported by the game
  */
-SettingsState::SettingsState(
-    std::stack<std::unique_ptr<State>>& states, 
-    std::shared_ptr<sf::RenderWindow> window, 
-    std::map<std::string, int>* keys
+SettingsState::SettingsState(std::stack<std::unique_ptr<State>>& states,  std::shared_ptr<sf::RenderWindow> window,  std::map<std::string, int>* keys
 )
     :   State(states, window, keys)
 {
@@ -58,7 +55,7 @@ void SettingsState::update(const float& dt)
  *  @brief Function that renders the game state
  *  @param target   RenderWindow where the state will be drawn
  */
-void SettingsState::render(std::shared_ptr<sf::RenderWindow> target)
+void SettingsState::render(std::shared_ptr<sf::RenderTarget> target)
 {
     if (!target)
         target = window_;
@@ -211,7 +208,7 @@ void SettingsState::updateButtons(const float& dt)
 /**
  * @brief Function that renders the buttons of the state
  */
-void SettingsState::renderButtons(std::shared_ptr<sf::RenderWindow> target)
+void SettingsState::renderButtons(std::shared_ptr<sf::RenderTarget> target)
 {
 
     for (auto& button : buttons_)
@@ -253,7 +250,7 @@ void SettingsState::updateDropDownLists(const float& dt)
 /**
  * @brief Function that renders the drop down lists of the state
  */
-void SettingsState::renderDropDownLists(std::shared_ptr<sf::RenderWindow> target)
+void SettingsState::renderDropDownLists(std::shared_ptr<sf::RenderTarget> target)
 {
 
     for (const auto& list : dropDownLists_)

@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/State/EditorState.h"
+#include "../headers.h"
+#include "EditorState.h"
 
 
 /**
@@ -8,10 +8,7 @@
  * @param window    Window where the state will be drawn into
  * @param keys      Keys supported by the game
  */
-EditorState::EditorState(
-    std::stack<std::unique_ptr<State>>& states, 
-    std::shared_ptr<sf::RenderWindow> window, 
-    std::map<std::string, int>* keys
+EditorState::EditorState(std::stack<std::unique_ptr<State>>& states, std::shared_ptr<sf::RenderWindow> window, std::map<std::string, int>* keys
 )
     :   State(states, window, keys)
 {
@@ -59,7 +56,7 @@ void EditorState::update(const float& dt)
  *  @brief Function that renders the game state
  *  @param target   RenderWindow where the state will be drawn
  */
-void EditorState::render(std::shared_ptr<sf::RenderWindow> target)
+void EditorState::render(std::shared_ptr<sf::RenderTarget> target)
 {
     if (!target)
         target = window_;
@@ -148,7 +145,7 @@ void EditorState::updateButtons(const float& dt)
 /**
  * @brief Function that renders the buttons of the state
  */
-void EditorState::renderButtons(std::shared_ptr<sf::RenderWindow> target)
+void EditorState::renderButtons(std::shared_ptr<sf::RenderTarget> target)
 {
 
     for (auto& button : buttons_)

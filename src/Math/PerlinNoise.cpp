@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Math/PerlinNoise.h"
+#include "../headers.h"
+#include "PerlinNoise.h"
 
 
 /**

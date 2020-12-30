@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Entities/HitboxComponent.h"
+#include "../headers.h"
+#include "HitboxComponent.h"
 
 /**
  * @brief Constructor
@@ -12,11 +12,11 @@ HitboxComponent::HitboxComponent(sf::Sprite& sprite, Vector offset, Vector size)
         sprite_(sprite)
 {
     // Creating the hitbox
-    hitbox_.setSize(size.getAsVector2f());
-    hitbox_.setPosition(sprite.getPosition().x + offset.getX(), sprite.getPosition().y + offset.getY());
-    hitbox_.setFillColor(sf::Color::Transparent);
-    hitbox_.setOutlineColor(sf::Color::Red);
-    hitbox_.setOutlineThickness(1.0f);
+    setSize(size.getAsVector2f());
+    setPosition(sprite.getPosition().x + offset.getX(), sprite.getPosition().y + offset.getY());
+    setFillColor(sf::Color::Transparent);
+    setOutlineColor(sf::Color::Red);
+    setOutlineThickness(1.0f);
 }
 
 /**
@@ -33,18 +33,16 @@ HitboxComponent::~HitboxComponent()
  */
 void HitboxComponent::update(const float& dt)
 {
-    // TO CONTINUE (dt not used)
-    float a = dt - dt;
-    hitbox_.setPosition(sprite_.getPosition().x + offset_.getX() + a, sprite_.getPosition().y + offset_.getY());
+    setPosition(sprite_.getPosition().x + offset_.getX(), sprite_.getPosition().y + offset_.getY());
 }
 
 /**
  * @brief Method that renders the hitbox component
  * @param window    Target where the draw the hitbox
  */
-void HitboxComponent::render(std::shared_ptr<sf::RenderWindow> target)
+void HitboxComponent::render(std::shared_ptr<sf::RenderTarget> target)
 {
-    target->draw(hitbox_);
+    target->draw(*this);
 }
 
 /**
@@ -53,7 +51,7 @@ void HitboxComponent::render(std::shared_ptr<sf::RenderWindow> target)
  */
 bool HitboxComponent::isIntersecting(const sf::FloatRect& rect) const
 {
-    return hitbox_.getGlobalBounds().intersects(rect);
+    return getGlobalBounds().intersects(rect);
 }
 
 /**
@@ -62,5 +60,5 @@ bool HitboxComponent::isIntersecting(const sf::FloatRect& rect) const
  */
 sf::FloatRect HitboxComponent::getHitbox() const
 {
-    return hitbox_.getGlobalBounds();
+    return getGlobalBounds();
 }

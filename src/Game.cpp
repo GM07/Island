@@ -1,5 +1,5 @@
-#include "../include/headers.h"
-#include "../include/Game.h"
+#include "headers.h"
+#include "Game.h"
 
 
 /// Constructor

@@ -1,5 +1,5 @@
-#include "../include/headers.h"
-#include "../include/Window.h"
+#include "headers.h"
+#include "Window.h"
 
 /**
  * @brief Constructor with parameters

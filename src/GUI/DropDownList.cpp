@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/GUI/DropDownList.h"
+#include "../headers.h"
+#include "DropDownList.h"
 
 /**
  * @brief Constructor
@@ -77,7 +77,7 @@ void gui::DropDownList::update(const float& dt)
  * @brief Function that renders the drop down list
  * @param target            Where to draw the list
  */
-void gui::DropDownList::render(std::shared_ptr<sf::RenderWindow> target)
+void gui::DropDownList::render(std::shared_ptr<sf::RenderTarget> target)
 {
     if (dropDown_)
     {

@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Entities/Entity.h"
+#include "../headers.h"
+#include "Entity.h"
 
 /**
  * @brief Function that intializes the shape of the entity

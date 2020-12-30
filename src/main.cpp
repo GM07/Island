@@ -1,8 +1,6 @@
-#include "../include/headers.h"
-#include "../include/Game.h"
+#include "headers.h"
+#include "Game.h"
 
-#include "../include/Math/PerlinNoise.h"
-#include "../include/Map/Map.h"
 
 int main()
 {

@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Map/Chunk.h"
+#include "../headers.h"
+#include "Chunk.h"
 
 const float Chunk::DEFAULT_SIZE = 16.0f;
 
@@ -42,7 +42,7 @@ void Chunk::update(const float& dt)
  * @brief Function that renders the tile
  * @param target        Where to draw the tile
  */
-void Chunk::render(std::shared_ptr<sf::RenderWindow> target)
+void Chunk::render(std::shared_ptr<sf::RenderTarget> target)
 {
 
     // Rendering tiles
@@ -59,7 +59,7 @@ void Chunk::render(std::shared_ptr<sf::RenderWindow> target)
  * @brief Function that renders the tile on top
  * @param target        Where to draw the tile
  */
-void Chunk::renderOnTop(std::shared_ptr<sf::RenderWindow> target)
+void Chunk::renderOnTop(std::shared_ptr<sf::RenderTarget> target)
 {
     // Rendering tiles
     for (const auto& tile : nature_)

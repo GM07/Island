@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Map/TerrainGenerator.h"
+#include "../headers.h"
+#include "TerrainGenerator.h"
 
 /**
  * @brief Constructor

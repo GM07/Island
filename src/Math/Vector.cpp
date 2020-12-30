@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/Math/Vector.h"
+#include "../headers.h"
+#include "Vector.h"
 
 // Constructors
 
@@ -42,6 +42,23 @@ float Vector::norm() const
 {
     return static_cast<float>(sqrt(x_ * x_ + y_ * y_));
 }
+
+/**
+ * @brief Function that normalizes the vector
+ * @return Vector normalized
+ */
+Vector& Vector::normalize() 
+{
+    double n = norm();
+    if (n == 0)
+        throw ("Norm is null");
+    
+    x_ /= n;
+    y_ /= n;
+
+    return *this;
+}
+
 
 /**
  * @brief Function that returns the positions of the 4 corners of a rectangle

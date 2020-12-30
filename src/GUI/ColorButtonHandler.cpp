@@ -1,5 +1,5 @@
-#include "../../include/headers.h"
-#include "../../include/GUI/ColorButtonHandler.h"
+#include "../headers.h"
+#include "ColorButtonHandler.h"
 
 /**
  * @brief Constructor
